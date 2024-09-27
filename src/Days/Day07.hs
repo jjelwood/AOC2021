@@ -21,19 +21,31 @@ runDay = R.runDay inputParser partA partB
 
 ------------ PARSER ------------
 inputParser :: Parser Input
-inputParser = error "Not implemented yet!"
+inputParser = decimal `sepBy` char ','
 
 ------------ TYPES ------------
-type Input = Void
+type Input = [Int]
 
-type OutputA = Void
+type OutputA = Int
 
-type OutputB = Void
+type OutputB = Int
 
 ------------ PART A ------------
+fuelCostA :: Int -> [Int] -> Int
+fuelCostA x = sum . map (\c -> abs (c - x))
+
+minCost :: (Int -> [Int] -> Int) -> [Int] -> Int
+minCost f input = minimum $ map (`f` input) [minimum input .. maximum input]
+
 partA :: Input -> OutputA
-partA = error "Not implemented yet!"
+partA = minCost fuelCostA
 
 ------------ PART B ------------
+fuelCostB :: Int -> [Int] -> Int
+fuelCostB x = sum . map cost
+    where
+        dist c = abs (c - x)
+        cost c = dist c * (dist c + 1) `div` 2
+
 partB :: Input -> OutputB
-partB = error "Not implemented yet!"
+partB = minCost fuelCostB

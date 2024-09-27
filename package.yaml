@@ -1,10 +1,10 @@
 name:                aoc-template
 version:             2023.0
-github:              "samcoy3/advent-of-code-template"
+github:              "jjelwood/aoc2021"
 license:             BSD3
-author:              "Sam Coy"
-maintainer:          "samcoy3@gmail.com"
-copyright:           "2023 Sam Coy"
+author:              "JJ Elwood"
+maintainer:          "jjelwood2005@gmail.com"
+copyright:           "2024 JJ Elwood"
 
 extra-source-files:
 - README.md
@@ -30,6 +30,9 @@ dependencies:
 - text
 - mtl
 - vector
+- MemoTrie
+- search-algorithms
+- matrix
 
 library:
   source-dirs: src

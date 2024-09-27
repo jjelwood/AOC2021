@@ -21,19 +21,32 @@ runDay = R.runDay inputParser partA partB
 
 ------------ PARSER ------------
 inputParser :: Parser Input
-inputParser = error "Not implemented yet!"
+inputParser = do
+  sepBy1 decimal endOfLine
 
 ------------ TYPES ------------
-type Input = Void
+type Input = [Int]
 
-type OutputA = Void
+type OutputA = Int
 
-type OutputB = Void
+type OutputB = Int
+
+countIncreasesWindow :: Int -> [Int] -> Int
+countIncreasesWindow _ [] = 0
+countIncreasesWindow n xs
+  | length xs <= n = 0
+  | otherwise = (if sum (Data.List.take n xs) < sum (Data.List.take n $ tail xs) then 1 else 0) 
+    + countIncreasesWindow n (tail xs)
+
+countIncreases :: [Int] -> Int
+countIncreases [] = 0
+countIncreases [_] = 0
+countIncreases (x:y:xs) = (if x < y then 1 else 0) + countIncreases (y:xs)
 
 ------------ PART A ------------
 partA :: Input -> OutputA
-partA = error "Not implemented yet!"
+partA = countIncreases
 
 ------------ PART B ------------
 partB :: Input -> OutputB
-partB = error "Not implemented yet!"
+partB = countIncreasesWindow 3

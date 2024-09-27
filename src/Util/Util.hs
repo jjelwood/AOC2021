@@ -4,6 +4,9 @@ module Util.Util where
 import Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
 import Debug.Trace (trace)
+import Data.List (transpose)
+import Data.Set (Set)
+import qualified Data.Set as Set
 {- ORMOLU_ENABLE -}
 
 {-
@@ -73,3 +76,21 @@ mapBoundingBox m =
     (maximum . fmap fst . Map.keys $ m)
     (minimum . fmap snd . Map.keys $ m)
     (maximum . fmap snd . Map.keys $ m)
+
+setBoundingBox :: Set (Int, Int) -> (Int, Int, Int, Int)
+setBoundingBox s =
+  (,,,)
+    (minimum . fmap fst . Set.toList $ s)
+    (maximum . fmap fst . Set.toList $ s)
+    (minimum . fmap snd . Set.toList $ s)
+    (maximum . fmap snd . Set.toList $ s)
+
+prettyMap :: (Show a) => Map (Int, Int) a -> String
+prettyMap m = unlines $ [ [ head $ show $ m Map.! (x, y) | x <- [minX .. maxX] ] | y <- [minY .. maxY] ]
+  where
+    (minX, maxX, minY, maxY) = mapBoundingBox m
+
+prettySet :: Char -> Char -> Set (Int, Int) -> String
+prettySet cIn cOut s = unlines $ [ [ if (x, y) `Set.member` s then cIn else cOut | x <- [minX .. maxX] ] | y <- [minY .. maxY] ]
+  where
+    (minX, maxX, minY, maxY) = setBoundingBox s
