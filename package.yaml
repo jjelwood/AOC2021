@@ -33,6 +33,7 @@ dependencies:
 - MemoTrie
 - search-algorithms
 - matrix
+- more-containers
 
 library:
   source-dirs: src

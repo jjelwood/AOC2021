@@ -74,6 +74,7 @@ library
     , containers
     , directory
     , matrix
+    , more-containers
     , mtl
     , optparse-applicative
     , parser-combinators
@@ -107,6 +108,7 @@ executable aoc-template-exe
     , containers
     , directory
     , matrix
+    , more-containers
     , mtl
     , optparse-applicative
     , parser-combinators

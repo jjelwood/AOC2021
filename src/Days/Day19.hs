@@ -53,6 +53,8 @@ data Scanner = Scanner { num :: Int, offsets :: [Matrix Int] } deriving (Eq, Sho
 instance Ord a => Ord (Matrix a) where
     compare a b = compare (toList a) (toList b)
 
+type Fingerprint = (Int, Int, Int)
+
 type OutputA = Int
 
 type OutputB = Int
@@ -62,7 +64,10 @@ pairs :: [a] -> [(a, a)]
 pairs [] = []
 pairs (x:xs) = map (\y -> (x, y)) xs ++ pairs xs
 
-fingerprints :: Scanner -> Map (Int, Int, Int) (Matrix Int, Matrix Int)
+dim :: Scanner -> Int
+dim = nrows . head . offsets 
+
+fingerprints :: Scanner -> Map Fingerprint (Matrix Int, Matrix Int)
 fingerprints b = Map.fromList $ map (\pair -> ((dist pair, minDisp pair, maxDisp pair), pair)) $ pairs (offsets b)
     where
         dist = sum . disps
@@ -89,31 +94,17 @@ permMatrices n = map makeMatrix $ Data.List.permutations [1..n]
 configurations :: Int -> [Matrix Int]
 configurations = nub . concatMap dirs . permMatrices
 
-findOverlappingRegions :: [Scanner] -> [(Scanner, Scanner)]
-findOverlappingRegions bs = [(bs !! i, bs !! j) |
-                               i <- [0 .. length bs - 1],
-                               j <- [i+1 .. length bs - 1],
-                               i /= j,
-                               12 <= Set.size (Map.keysSet (fingerprints (bs !! i)) `Set.intersection` Map.keysSet (fingerprints (bs !! j)))]
-
 -- trys to find the relative location of the first scanner with respect to the second scanner
 triangulate :: (Scanner, Scanner) -> Maybe (Matrix Int)
-triangulate (s1, s2) = if Map.size overlappingFingerprints >= cn * (cn - 1) `div` 2
-    then Just $ head $ Set.elems $ foldl1 Set.intersection $ map findOther $ configurations dim
+triangulate (s1, s2) = if Map.size overlappingFingerprints >= 0 --cn * (cn - 1) `div` 2
+    then Just $ Set.elemAt 0 $ foldl1 Set.intersection $ map findOther $ configurations $ dim s1
     else Nothing
     where
         findOther c = foldl1 Set.intersection $ Map.elems $ Map.map (tryFindPoint c) overlappingFingerprints
-        consistentValue xs = if allEqualNotNothing xs then head xs else Nothing
         overlappingFingerprints = Map.intersectionWith (,) fingerprints1 fingerprints2
         fingerprints1 = fingerprints s1
         fingerprints2 = fingerprints s2
-        dim = nrows $ head $ offsets s1
-        cn = length $ configurations dim
-
-allEqualNotNothing :: Eq a => [Maybe a] -> Bool
-allEqualNotNothing [] = True
-allEqualNotNothing (Nothing:_) = False
-allEqualNotNothing (Just x:xs) = all (== Just x) xs
+        cn = length $ configurations $ dim s1
 
 tryFindPoint :: Matrix Int -> ((Matrix Int, Matrix Int), (Matrix Int, Matrix Int)) -> Set (Matrix Int)
 tryFindPoint c ((p1, p2), (p3, p4)) = Set.fromList $ catMaybes [c1, c2]
@@ -122,9 +113,7 @@ tryFindPoint c ((p1, p2), (p3, p4)) = Set.fromList $ catMaybes [c1, c2]
     c2 = if p1 + multStd c p4 == p2 + multStd c p3 then Just $ p1 + multStd c p4 else Nothing
 
 partA :: Input -> OutputA
--- partA = error "Not implemented yet!"
-partA = length . traceShowId . mapMaybe triangulate . findOverlappingRegions
--- partA inp = find ((== 0) . fst) . map (Data.Bifunctor.bimap num num) $ findOverlappingRegions inp
+partA inp = traceShow (mapMaybe triangulate $ pairs inp) 1
 
 ------------ PART B ------------
 partB :: Input -> OutputB

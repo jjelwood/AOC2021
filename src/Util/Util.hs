@@ -23,7 +23,7 @@ freq = Map.fromListWith (+) . fmap (,1)
 -- For example:
 --     Input: [[a,b,c],[d,e]]
 --     Output: Map.fromList [((0,0),a), ((0,1),b), ((0,2),c), ((1,0),d), ((1,1),e)]
-mapFromNestedLists :: (Ord a) => [[a]] -> Map (Int, Int) a
+mapFromNestedLists :: [[a]] -> Map (Int, Int) a
 mapFromNestedLists = Map.fromList . attachCoords 0 0
   where
     attachCoords _ _ [] = []
@@ -76,6 +76,9 @@ mapBoundingBox m =
     (maximum . fmap fst . Map.keys $ m)
     (minimum . fmap snd . Map.keys $ m)
     (maximum . fmap snd . Map.keys $ m)
+
+flipDimensions :: Map (Int, Int) a -> Map (Int, Int) a
+flipDimensions m = Map.fromList [((y, x), v) | ((x, y), v) <- Map.toList m]
 
 setBoundingBox :: Set (Int, Int) -> (Int, Int, Int, Int)
 setBoundingBox s =
